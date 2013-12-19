@@ -1,12 +1,14 @@
 package main
 
 import (
-	"strings"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/smtp"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 func main() {
@@ -32,7 +34,8 @@ var lognames = []string{
 }
 
 func buildMsg() (msg []byte) {
-	msg = []byte("Subject: rwc nightly system logs\r\n\r\n")
+	subj := fmt.Sprintf("Subject: rwc nightly system logs (%v)\r\n\r\n", time.Now())
+	msg = []byte(subj)
 	for _, fname := range lognames {
 		msg = append(msg, []byte("------ "+fname+" ------\n")...)
 		fpath := filepath.Join(os.Getenv("HOME"), "logs", fname)
