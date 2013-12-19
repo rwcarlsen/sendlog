@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,25 +28,34 @@ func main() {
 var lognames = []string{
 	"JOURNAL_ERRS.txt",
 	"CRON_RUNS.txt",
-	"localbackup.txt",
-	"nasbackup.txt",
 	"NET_SERVICES.txt",
 	"ORPHANS.txt",
+	"nasbackup.log",
+	"localbackup.log",
 }
 
 func buildMsg() (msg []byte) {
 	subj := fmt.Sprintf("Subject: rwc nightly system logs (%v)\r\n\r\n", time.Now())
-	msg = []byte(subj)
+	buf := bytes.NewBufferString(subj)
 	for _, fname := range lognames {
-		msg = append(msg, []byte("------ "+fname+" ------\n")...)
+		fmt.Fprintf(buf, "------ %v ------\n", fname)
 		fpath := filepath.Join(os.Getenv("HOME"), "logs", fname)
 		data, err := ioutil.ReadFile(fpath)
 		if err != nil {
-			msg = append(msg, []byte(err.Error())...)
+			buf.WriteString(err.Error())
 		} else {
-			msg = append(msg, data...)
+			lines := bytes.Split(data, []byte("\n"))
+			for i, line := range lines {
+				buf.Write(line)
+				buf.WriteString("\n")
+				if i == 100 {
+					fmt.Fprintf(buf, "... %v lines of output truncated\n", len(lines))
+					break
+				}
+			}
 		}
-		msg = append(msg, []byte("\r\n\r\n")...)
+		buf.WriteString("\r\n\r\n")
 	}
-	return msg
+	return buf.Bytes()
 }
+
