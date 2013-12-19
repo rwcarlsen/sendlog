@@ -30,6 +30,7 @@ var lognames = []string{
 	"CRON_RUNS.txt",
 	"NET_SERVICES.txt",
 	"ORPHANS.txt",
+	"backup-summary.log",
 	"nasbackup.log",
 	"localbackup.log",
 }
