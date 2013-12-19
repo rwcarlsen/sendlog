@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"io/ioutil"
 	"log"
 	"net/smtp"
@@ -22,16 +23,16 @@ func main() {
 }
 
 var lognames = []string{
-	"PKGLIST.txt",
-	"ORPHANS.txt",
-	"NET_SERVICES.txt",
-	"localbackup.txt",
-	"nasbackup.txt",
 	"JOURNAL_ERRS.txt",
 	"CRON_RUNS.txt",
+	"localbackup.txt",
+	"nasbackup.txt",
+	"NET_SERVICES.txt",
+	"ORPHANS.txt",
 }
 
 func buildMsg() (msg []byte) {
+	msg = []byte("Subject: rwc nightly system logs\r\n\r\n")
 	for _, fname := range lognames {
 		msg = append(msg, []byte("------ "+fname+" ------\n")...)
 		fpath := filepath.Join(os.Getenv("HOME"), "logs", fname)
@@ -41,7 +42,7 @@ func buildMsg() (msg []byte) {
 		} else {
 			msg = append(msg, data...)
 		}
-		msg = append(msg, []byte("\n\n")...)
+		msg = append(msg, []byte("\r\n\r\n")...)
 	}
 	return msg
 }
