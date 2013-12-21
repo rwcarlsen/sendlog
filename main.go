@@ -50,7 +50,7 @@ func buildMsg() (msg []byte) {
 				buf.Write(line)
 				buf.WriteString("\n")
 				if i == 100 {
-					fmt.Fprintf(buf, "... %v lines of output truncated\n", len(lines))
+					fmt.Fprintf(buf, "... %v lines of output truncated\n", len(lines)-100)
 					break
 				}
 			}
@@ -59,4 +59,3 @@ func buildMsg() (msg []byte) {
 	}
 	return buf.Bytes()
 }
-
